@@ -36,9 +36,9 @@ layout = html.Div(
         multiple = True
 
         ),
-
-        html.Div(id = 'kill_graph'), #this layout will host our data visualizations, e.g., graphs
-        html.Div(id = 'kill_heatmap'), #this layout will host our data visualizations, e.g., graphs
+        html.Div(id = "headlines"),
+        html.Div(id = 'kill_graph', style = {'width': '49%', 'display': 'inline-block'}), #this layout will host our data visualizations, e.g., graphs
+        html.Div(id = 'kill_heatmap', style = {'width': '49%', 'display': 'inline-block'}), #this layout will host our data visualizations, e.g., graphs
         html.Div(id='output-data-upload'), #this is where we will put a table of csv if needed
 
     ])
@@ -63,8 +63,6 @@ def parse_contents(contents, filename, date): #this function will parse through 
     
     players = list(set(df['Player'].values.tolist())) #get list of unique players
     kill_types = list(set(df['Offense Type'].values.tolist())) #get list of unique players
-
-    print(kill_types)
 
     return html.Div([ #when a csv is uploaded, this parse function will also return a drop down and data visualization
         html.H5(filename),
@@ -97,15 +95,11 @@ def parse_contents(contents, filename, date): #this function will parse through 
         #     'wordBreak': 'break-all'
         # })
 
-        dcc.Checklist(
-            id = 'kill_comparison',
-            options = kill_types,
-        )
-        
     ])
 
-@dash.callback(Output('output-data-upload', 'children'), #callback is triggered by uploaded data
-              Input('upload_data', 'contents'),
+#CALLBACK TO UPLOAD DATA FOR USE WITH SECOND CALLBACK
+@dash.callback(Output('output-data-upload', 'children'), 
+              Input('upload_data', 'contents'), #callback is triggered by uploaded data
               State('upload_data', 'filename'),
               State('upload_data', 'last_modified'))
 
@@ -116,9 +110,11 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
             zip(list_of_contents, list_of_names, list_of_dates)]
         return children
 
+#SECOND CALLBACK TO GENERATE VISUALIZATIONS FROM FIRST CALLBACK 
 @dash.callback(Output('kill_graph', 'children'),
               Output('kill_heatmap', 'children'),
-              Input("submit-button", "n_clicks"),
+              Output('headlines', 'children'),
+              Input("submit-button", "n_clicks"), #callback is triggered by clicking button
               State('stored-data', 'data'),
               State('dropdown', 'value'))
 
@@ -126,21 +122,40 @@ def get_kill_stats(n, data, player):
     if n is None:
         return no_update
     else:
+
+        #BAR CHART (TYPE OF KILLS)
         df = pd.DataFrame.from_dict(data)
         player_df = df[df['Player'] == player] #filter by player
         non_na_df = player_df[player_df["Offense Type"].notnull()]#filter by non-na kill values
         grouped_df = non_na_df.groupby("Offense Type", as_index = False).agg(kill_counts = ("Offense Type", 'count')) #group by offense type and aggregate sum the counts
 
-        fig = px.bar(grouped_df, x = "Offense Type", y = "kill_counts")
+        #convert errors to negative counts
+        for index, row in grouped_df.iterrows():
+            if "error" in row['Offense Type']:
+                grouped_df.at[index, 'kill_counts'] = -row['kill_counts'] #make any errors have negative count
+
+        #sort dataframe
+        grouped_df = grouped_df.sort_values(by = 'kill_counts', ascending =  False)
+
+        fig = px.bar(grouped_df, x = "Offense Type", y = "kill_counts") #bar chart
     
+        #HEADLINES
 
-        #get sum of all kills
-        total_kills = grouped_df['kill_counts'].sum()
+        #net points
+        net_points = grouped_df['kill_counts'].sum()
 
-        #create string output of total kills
-        number_of_kills = "Total kills was {}".format(total_kills)
+        #scored points
+        scored_points = grouped_df[grouped_df['kill_counts'] > 0]['kill_counts'].sum()
 
-        #HEATMAP
+        #errors
+        errors = abs(grouped_df[grouped_df['kill_counts'] < 0]['kill_counts'].sum()) #take positive of negative number
+
+        #headline outputs
+        scored_message = "{} points scored".format(scored_points)
+        error_message = "{} errors".format(errors)
+        net_message = "Net score: {}".format(net_points)
+
+        #HEATMAP (LOCATION OF KILLS)
         #heat map of kill locations
         location_df = non_na_df.groupby("Location", as_index = False).agg(location_counts = ("Location", 'count')) #group by offense type and aggregate sum the counts
 
@@ -158,17 +173,17 @@ def get_kill_stats(n, data, player):
 
         rearranged_locations = [location_counts[0:3], location_counts[3:6]]
 
+        hm = px.imshow(rearranged_locations, color_continuous_scale = 'Greens', text_auto = True, title = "Location of Kills on Court (non-shank points)") #heat map
 
-        #HEATMAP
-        hm = px.imshow(rearranged_locations, color_continuous_scale = 'Greens')
-
-        #return barchart Dash object
+        #return visualizations and other elements
         return html.Div([
-            html.H6(children = number_of_kills, style={'fontSize':50, 'textAlign':'left'}),
             dcc.Graph(figure = fig),
-        ]), html.Div([
-            dcc.Graph(figure = hm)
-        ])
-
+        ]), html.Div([ 
+            dcc.Graph(figure = hm, style = {'width': '49%', 'display': 'inline-block'}), 
+            ]), html.Div([
+                html.H2(children = scored_message, style={'fontSize':24, 'textAlign':'left'}),
+                html.H2(children = error_message, style={'fontSize':24, 'textAlign':'left'}),
+                html.H2(children = net_message, style={'fontSize':24, 'textAlign':'left'}),
+            ])
 
     
