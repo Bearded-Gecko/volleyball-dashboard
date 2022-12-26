@@ -39,6 +39,7 @@ layout = html.Div(
         html.Div(id = "headlines"),
         html.Div(id = 'kill_graph', style = {'width': '49%', 'display': 'inline-block'}), #this layout will host our data visualizations, e.g., graphs
         html.Div(id = 'kill_heatmap', style = {'width': '49%', 'display': 'inline-block'}), #this layout will host our data visualizations, e.g., graphs
+        html.Div(id = 'dig_heatmap'), #defense visualization of heat map
         html.Div(id='output-data-upload'), #this is where we will put a table of csv if needed
 
     ])
@@ -62,7 +63,7 @@ def parse_contents(contents, filename, date): #this function will parse through 
         ])
     
     players = list(set(df['Player'].values.tolist())) #get list of unique players
-    kill_types = list(set(df['Offense Type'].values.tolist())) #get list of unique players
+    kill_types = list(set(df['Event'].values.tolist())) #get list of unique players
 
     return html.Div([ #when a csv is uploaded, this parse function will also return a drop down and data visualization
         html.H5(filename),
@@ -113,6 +114,7 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
 #SECOND CALLBACK TO GENERATE VISUALIZATIONS FROM FIRST CALLBACK 
 @dash.callback(Output('kill_graph', 'children'),
               Output('kill_heatmap', 'children'),
+              Output('dig_heatmap', 'children'),
               Output('headlines', 'children'),
               Input("submit-button", "n_clicks"), #callback is triggered by clicking button
               State('stored-data', 'data'),
@@ -126,18 +128,18 @@ def get_kill_stats(n, data, player):
         #BAR CHART (TYPE OF KILLS)
         df = pd.DataFrame.from_dict(data)
         player_df = df[df['Player'] == player] #filter by player
-        non_na_df = player_df[player_df["Offense Type"].notnull()]#filter by non-na kill values
-        grouped_df = non_na_df.groupby("Offense Type", as_index = False).agg(kill_counts = ("Offense Type", 'count')) #group by offense type and aggregate sum the counts
+        non_na_df = player_df[(player_df["Event"].notnull()) & (player_df["Event"] != 'dig')]#filter by non-na kill values
+        grouped_df = non_na_df.groupby("Event", as_index = False).agg(kill_counts = ("Event", 'count')) #group by Event and aggregate sum the counts
 
         #convert errors to negative counts
         for index, row in grouped_df.iterrows():
-            if "error" in row['Offense Type']:
+            if "error" in row['Event']:
                 grouped_df.at[index, 'kill_counts'] = -row['kill_counts'] #make any errors have negative count
 
         #sort dataframe
         grouped_df = grouped_df.sort_values(by = 'kill_counts', ascending =  False)
 
-        fig = px.bar(grouped_df, x = "Offense Type", y = "kill_counts") #bar chart
+        fig = px.bar(grouped_df, x = "Event", y = "kill_counts") #bar chart
     
         #HEADLINES
 
@@ -157,7 +159,9 @@ def get_kill_stats(n, data, player):
 
         #HEATMAP (LOCATION OF KILLS)
         #heat map of kill locations
-        location_df = non_na_df.groupby("Location", as_index = False).agg(location_counts = ("Location", 'count')) #group by offense type and aggregate sum the counts
+        location_df = non_na_df.groupby("Location", as_index = False).agg(location_counts = ("Location", 'count')) #group by Event and aggregate sum the counts
+
+        print(non_na_df)
 
         #convert locations to int
         location_df['Location'] = location_df['Location'].astype(int)
@@ -170,16 +174,65 @@ def get_kill_stats(n, data, player):
             else:
                 location_counts.append(0)
 
+        #now rearrange court index and counts to match heatmap orientation, i.e. convert [[1, 2, 3], [4, 5, 6]], which represents the heat map, to [[4, 3, 2], [5, 6, 1]], which represents the court
+        court_indexes = [4, 3, 2, 5, 6, 1]
+        court_indexes = [int(x) for x in court_indexes] #convert court indexes to int type
 
-        rearranged_locations = [location_counts[0:3], location_counts[3:6]]
+        court_counts = []
+
+        for court_index in court_indexes:
+            court_counts.append(location_counts[court_index - 1])
+        
+        rearranged_locations = [court_counts[0:3], court_counts[3:6]] #correct court indexes for heat map
 
         hm = px.imshow(rearranged_locations, color_continuous_scale = 'Greens', text_auto = True, title = "Location of Kills on Court (non-shank points)") #heat map
+
+        #DIG HEATMAP
+        #heat map of dig locations
+        defense_df = player_df[player_df["Event"] == 'dig']
+        print(defense_df)
+
+        dig_location_df = defense_df.groupby("Location", as_index = False).agg(location_counts = ("Location", 'count')) #group by Event and aggregate sum the counts
+
+        #convert locations to int
+        dig_location_df['Location'] = dig_location_df['Location'].astype(int)
+
+        #iterate through locations and their values to arrange in format for heatmap
+        dig_location_counts = []
+        for i in range(1, 7, 1):
+            if i in dig_location_df['Location'].tolist():
+                dig_location_counts.append(dig_location_df.loc[dig_location_df['Location'] == i]['location_counts'].values[0])
+            else:
+                dig_location_counts.append(0)
+
+        #now rearrange court index and counts to match heatmap orientation, i.e. convert [[1, 2, 3], [4, 5, 6]], which represents the heat map, to [[4, 3, 2], [5, 6, 1]], which represents the court
+        dig_court_counts = []
+
+        for court_index in court_indexes:
+            dig_court_counts.append(dig_location_counts[int(court_index) - 1])
+
+        dig_rearranged_locations = [dig_court_counts[0:3], dig_court_counts[3:6]] #correct court indexes for heat map
+
+        dig_hm = px.imshow(dig_rearranged_locations, color_continuous_scale = 'Oranges', text_auto = True, title = "Location of Digs on Court") #heat map
+
+        # #return visualizations and other elements
+        # return html.Div([
+        #     dcc.Graph(figure = fig),
+        # ]), html.Div([ 
+        #     dcc.Graph(figure = hm), 
+        #     ]), html.Div([
+        #         html.H2(children = scored_message, style={'fontSize':24, 'textAlign':'left'}),
+        #         html.H2(children = error_message, style={'fontSize':24, 'textAlign':'left'}),
+        #         html.H2(children = net_message, style={'fontSize':24, 'textAlign':'left'}),
+        #     ])
 
         #return visualizations and other elements
         return html.Div([
             dcc.Graph(figure = fig),
         ]), html.Div([ 
-            dcc.Graph(figure = hm, style = {'width': '49%', 'display': 'inline-block'}), 
+            dcc.Graph(figure = hm), 
+            ]), html.Div([ 
+            dcc.Graph(figure = dig_hm), 
             ]), html.Div([
                 html.H2(children = scored_message, style={'fontSize':24, 'textAlign':'left'}),
                 html.H2(children = error_message, style={'fontSize':24, 'textAlign':'left'}),
