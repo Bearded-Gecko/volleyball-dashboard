@@ -170,6 +170,16 @@ def get_kill_stats(n, data, player):
             else:
                 location_counts.append(0)
 
+        #now rearrange court index and counts to match heatmap orientation, i.e. convert [[1, 2, 3], [4, 5, 6]], which represents the heat map, to [[4, 3, 2], [5, 6, 1]], which represents the court
+        court_indexes = [4, 3, 2, 5, 6, 1]
+
+        court_counts = []
+
+        for court_indexes in court_indexes:
+            court_counts.append(location_counts[court_indexes-1])
+
+        rearranged_locations = [court_counts[0:3], court_counts[3:6]] #correct court indexes for heat map
+
 
         rearranged_locations = [location_counts[0:3], location_counts[3:6]]
 
