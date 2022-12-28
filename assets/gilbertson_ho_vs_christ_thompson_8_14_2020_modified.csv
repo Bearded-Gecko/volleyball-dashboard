@@ -1,5 +1,28 @@
 Player,Set,Event,Location
+Mark,1,hard driven,1
+Michael,1,hard driven,1
+Mark,1,hit shank,
+Michael,1,roll shot,1
+Michael,1,roll shot,1
+Ben,1,tip,1
+Kyle,1,block kill,2
+Mark,1,roll shot,2
+Kyle,1,dig,3
+Kyle,1,cut shot,4
+Michael,1,cut shot,4
+Michael,1,tip,4
+Ben,1,dig,4
+Mark,1,dig,4
+Mark,1,dig,4
 Michael,1,hard driven,5
+Mark,1,block kill,5
+Mark,1,hard driven,5
+Michael,1,hard driven,5
+Kyle,1,tip,5
+Mark,1,touch,5
+Mark,1,dig,5
+Michael,1,dig,5
+Kyle,1,roll shot,6
 Ben,1,hitting error,
 Mark,1,hitting error,
 Mark,1,hitting error,
@@ -9,43 +32,44 @@ Michael,1,hitting error,
 Ben,1,service error,
 Mark,1,service error,
 Michael,1,service error,
-Ben,1,block,
-Kyle,1,block kill,2
-Mark,1,block kill,5
+Ben,1,block kill,4
 Ben,1,block shank,
-Kyle,1,cut shot,4
-Michael,1,cut shot,4
-Mark,1,hard driven,5
-Mark,1,hard driven,1
-Michael,1,hard driven,5
-Michael,1,hard driven,1
 Ben,1,hit shank,
 Kyle,1,hit shank,
 Mark,1,hit shank,
-Mark,1,hit shank,1
 Michael,1,hit shank,
 Michael,1,hit shank,
 Michael,1,hit shank,
-Kyle,1,roll shot,6
-Mark,1,roll shot,2
-Michael,1,roll shot,1
-Michael,1,roll shot,1
 Ben,1,serve shank,
 Kyle,1,serve shank,
 Michael,1,serve shank,
 Michael,1,serve shank,
 Michael,1,serve shank,
-Ben,1,tip,1
-Kyle,1,tip,5
-Michael,1,tip,4
 Ben,1,tool,
 Ben,1,tool,
 Mark,1,tool,
 Ben,1,tool,
-Mark,1,touch,5
-Ben,1,dig,4
-Kyle,1,dig,3
-Mark,1,dig,4
-Mark,1,dig,5
-Mark,1,dig,4
-Michael,1,dig,5
+Ben,1,cut attempt,
+Ben,1,roll attempt,
+Michael,1,hit attempt,
+Kyle,1,hit attempt,
+Ben,1,hit attempt,
+Kyle,1,roll attempt,
+Ben,1,hit attempt,
+Kyle ,1,hit attempt,
+Kyle,1,hit attempt,
+Mark,1,hit attempt,
+Mark,1,hit attempt,
+Ben,1,roll attempt,
+Kyle,1,hit attempt,
+Mark,1,hit attempt,
+Ben,1,roll attempt,
+Kyle,1,hit attempt,
+Michael,1,hit attempt,
+Ben,1,hit attempt,
+Michael,1,roll attempt,
+Kyle,1,roll attempt,
+Ben,1,roll attempt,
+Mark,1,cut attempt,
+Ben,1,hit attempt,
+Kyle,1,roll attempt,

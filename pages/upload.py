@@ -37,9 +37,9 @@ layout = html.Div(
 
         ),
         html.Div(id = "headlines"),
-        html.Div(id = 'kill_graph', style = {'width': '49%', 'display': 'inline-block'}), #this layout will host our data visualizations, e.g., graphs
-        html.Div(id = 'kill_heatmap', style = {'width': '49%', 'display': 'inline-block'}), #this layout will host our data visualizations, e.g., graphs
-        html.Div(id = 'dig_heatmap'), #defense visualization of heat map
+        html.Div(id = 'kill_graph', style = {'width': '33%', 'display': 'inline-block'}), #this layout will host our data visualizations, e.g., graphs
+        html.Div(id = 'kill_heatmap', style = {'width': '33%', 'display': 'inline-block'}), #this layout will host our data visualizations, e.g., graphs
+        html.Div(id = 'dig_heatmap', style = {'width': '33%', 'display': 'inline-block' }), #defense visualization of heat map
         html.Div(id='output-data-upload'), #this is where we will put a table of csv if needed
 
     ])
@@ -62,6 +62,8 @@ def parse_contents(contents, filename, date): #this function will parse through 
             'There was an error processing this file.'
         ])
     
+    df['Player'] = df['Player'].str.replace(" ", "") #remove white spaces from player names
+
     players = list(set(df['Player'].values.tolist())) #get list of unique players
     kill_types = list(set(df['Event'].values.tolist())) #get list of unique players
 
@@ -120,15 +122,15 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
               State('stored-data', 'data'),
               State('dropdown', 'value'))
 
-def get_kill_stats(n, data, player):
+def get_stats(n, data, player):
     if n is None:
         return no_update
     else:
 
-        #BAR CHART (TYPE OF KILLS)
+        #BAR CHART OF POINTS SCORED OR LOSS
         df = pd.DataFrame.from_dict(data)
         player_df = df[df['Player'] == player] #filter by player
-        non_na_df = player_df[(player_df["Event"].notnull()) & (player_df["Event"] != 'dig')]#filter by non-na kill values
+        non_na_df = player_df[(player_df["Event"].notnull()) & (player_df["Event"] != 'dig') & (~player_df["Event"].str.contains("attempt"))]#filter by non-na kill values
         grouped_df = non_na_df.groupby("Event", as_index = False).agg(kill_counts = ("Event", 'count')) #group by Event and aggregate sum the counts
 
         #convert errors to negative counts
@@ -143,6 +145,28 @@ def get_kill_stats(n, data, player):
     
         #HEADLINES
 
+        #calculate count of errors
+        error_df = player_df[player_df["Event"].str.contains("hitting error")] #filter by string with "hitting error"
+        error_counts = error_df.groupby("Event", as_index = False).agg(error_count = ("Event", 'count')) #aggregate count (sum) all the hitting errors
+        errors = error_counts['error_count'].sum() #take the summed aggregate count of hitting errors
+
+        #calculate count of attempts
+        attempt_df = player_df[player_df["Event"].str.contains("attempt")] #filter by string with "hitting error"
+        attempt_counts = attempt_df.groupby("Event", as_index = False).agg(attempt_count = ("Event", 'count')) #aggregate count (sum) all the hitting errors
+        attempts = attempt_counts['attempt_count'].sum() #take the summed aggregate count of hitting errors
+
+        #calculate kills
+        kill_types = ['hard driven', 'hit shank', 'roll shot', 'tip', 'block kill', 'cut shot', 'touch', 'block shank', 'tool'] #specify all kill types to filter by
+        kill_df = player_df[player_df['Event'].isin(kill_types)]
+        kill_counts = kill_df.groupby("Event", as_index = False).agg(kill_count = ("Event", 'count')) #aggregate count (sum) all the hitting errors
+        kills = kill_counts['kill_count'].sum() #take the summed aggregate count of hitting errors
+
+        #calculate total hits
+        total_attacks = errors + attempts + kills
+
+        #calculate hitting percentage
+        hit_pct = ((kills-errors)/total_attacks).round(3) #round to 3 decimal places
+
         #net points
         net_points = grouped_df['kill_counts'].sum()
 
@@ -150,18 +174,22 @@ def get_kill_stats(n, data, player):
         scored_points = grouped_df[grouped_df['kill_counts'] > 0]['kill_counts'].sum()
 
         #errors
-        errors = abs(grouped_df[grouped_df['kill_counts'] < 0]['kill_counts'].sum()) #take positive of negative number
+        all_errors = abs(grouped_df[grouped_df['kill_counts'] < 0]['kill_counts'].sum()) #take positive of negative number
 
         #headline outputs
-        scored_message = "{} points scored".format(scored_points)
-        error_message = "{} errors".format(errors)
-        net_message = "Net score: {}".format(net_points)
+        kill_message = "{} kills".format(kills)
+        hit_attempt_message = "{} hit attempts".format(attempts) #total number of hit attempts
+        scored_message = "{} points scored".format(scored_points) #total number of points scored
+        error_message = "{} errors".format(all_errors) #total number of errors
+        net_message = "Net score: {}".format(net_points) #net points scored
+        hit_pct_message = "hitting percentage was {} ({})".format(hit_pct, hit_attempt_message) #hit percentage
+
+
+        ##END OF HEADLINES##
 
         #HEATMAP (LOCATION OF KILLS)
         #heat map of kill locations
         location_df = non_na_df.groupby("Location", as_index = False).agg(location_counts = ("Location", 'count')) #group by Event and aggregate sum the counts
-
-        print(non_na_df)
 
         #convert locations to int
         location_df['Location'] = location_df['Location'].astype(int)
@@ -187,10 +215,13 @@ def get_kill_stats(n, data, player):
 
         hm = px.imshow(rearranged_locations, color_continuous_scale = 'Greens', text_auto = True, title = "Location of Kills on Court (non-shank points)") #heat map
 
+        hm.update_yaxes(showticklabels=False) #hide y-axis
+        hm.update_xaxes(showticklabels=False) #hide x-axis 
+        hm.update_layout(title_x=0.5) #move title to center
+
         #DIG HEATMAP
         #heat map of dig locations
         defense_df = player_df[player_df["Event"] == 'dig']
-        print(defense_df)
 
         dig_location_df = defense_df.groupby("Location", as_index = False).agg(location_counts = ("Location", 'count')) #group by Event and aggregate sum the counts
 
@@ -215,16 +246,23 @@ def get_kill_stats(n, data, player):
 
         dig_hm = px.imshow(dig_rearranged_locations, color_continuous_scale = 'Oranges', text_auto = True, title = "Location of Digs on Court") #heat map
 
-        # #return visualizations and other elements
-        # return html.Div([
-        #     dcc.Graph(figure = fig),
-        # ]), html.Div([ 
-        #     dcc.Graph(figure = hm), 
-        #     ]), html.Div([
-        #         html.H2(children = scored_message, style={'fontSize':24, 'textAlign':'left'}),
-        #         html.H2(children = error_message, style={'fontSize':24, 'textAlign':'left'}),
-        #         html.H2(children = net_message, style={'fontSize':24, 'textAlign':'left'}),
-        #     ])
+        dig_hm.update_yaxes(showticklabels=False) #hide y-axis
+        dig_hm.update_xaxes(showticklabels=False) #hide x-axis 
+        dig_hm.update_layout(title_x=0.5) #move title to center
+
+        #total number of digs + message
+        digs = dig_location_df['Location'].sum()
+        dig_message = "{} digs".format(digs)
+
+        ###BLOCKS###
+        block_df = player_df[player_df['Event'] == 'block attempt'] #filter by block attempts
+        block_counts = block_df.groupby("Event", as_index = False).agg(block_count = ("Event", 'count')) #aggregate count (sum) all block attempts
+        blocks = block_counts['block_count'].sum() #take the summed aggregate count of block attempts
+
+        #Message for blocks
+        block_message = "{} blocks".format(blocks)
+
+        ##BLOCK END##
 
         #return visualizations and other elements
         return html.Div([
@@ -234,9 +272,21 @@ def get_kill_stats(n, data, player):
             ]), html.Div([ 
             dcc.Graph(figure = dig_hm), 
             ]), html.Div([
+
+                html.Img(src = r'assets/attack.jpg', alt = 'image', style={'height':'10%', 'width': '20%', 'display': 'inline-block', 'padding': 10}),
+                html.H2(children = kill_message, style={'fontSize':24, 'textAlign':'left', 'width': '70%', 'display': 'inline-block', 'padding': 10}),
+
+                html.Img(src = r'assets/digs.jpg', alt = 'image', style={'height':'10%', 'width': '20%', 'display': 'inline-block', 'padding': 10}),
+                html.H2(children = dig_message, style={'fontSize':24, 'textAlign':'left', 'width': '70%', 'display': 'inline-block', 'padding': 10}),
+
+                html.Img(src = r'assets/blocks.jpg', alt = 'image', style={'height':'10%', 'width': '20%', 'display': 'inline-block', 'padding': 10}),
+                html.H2(children = block_message, style={'fontSize':24, 'textAlign':'left', 'width': '70%', 'display': 'inline-block', 'padding': 10}),
+
                 html.H2(children = scored_message, style={'fontSize':24, 'textAlign':'left'}),
+
                 html.H2(children = error_message, style={'fontSize':24, 'textAlign':'left'}),
-                html.H2(children = net_message, style={'fontSize':24, 'textAlign':'left'}),
+
+                html.H2(children = hit_pct_message, style={'fontSize':24, 'textAlign':'left', 'width': '50%', 'display': 'inline-block'}),
             ])
 
     
