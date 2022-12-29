@@ -8,6 +8,7 @@ import plotly.express as px
 import csv
 import pandas as pd
 import os
+import plotly.graph_objects as go
 
 dash.register_page(__name__) #dash.register_page tells Dash this is a page in your app and adds it to a page registry
 
@@ -40,6 +41,7 @@ layout = html.Div(
         html.Div(id = 'kill_graph', style = {'width': '33%', 'display': 'inline-block'}), #this layout will host our data visualizations, e.g., graphs
         html.Div(id = 'kill_heatmap', style = {'width': '33%', 'display': 'inline-block'}), #this layout will host our data visualizations, e.g., graphs
         html.Div(id = 'dig_heatmap', style = {'width': '33%', 'display': 'inline-block' }), #defense visualization of heat map
+        html.Div(id = "radar"),
         html.Div(id='output-data-upload'), #this is where we will put a table of csv if needed
 
     ])
@@ -117,6 +119,7 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
 @dash.callback(Output('kill_graph', 'children'),
               Output('kill_heatmap', 'children'),
               Output('dig_heatmap', 'children'),
+              Output('radar', 'children'),
               Output('headlines', 'children'),
               Input("submit-button", "n_clicks"), #callback is triggered by clicking button
               State('stored-data', 'data'),
@@ -264,14 +267,51 @@ def get_stats(n, data, player):
 
         ##BLOCK END##
 
+        ##RADAR GRAPH OF KILLS##
+
+        #get count of kill types
+        kill_type_counts = []
+        for kill in kill_types:
+            if kill in kill_counts['Event'].tolist():
+                kill_type_counts.append(kill_counts.loc[kill_counts['Event'] == kill]['kill_count'].values[0])
+            else:
+                kill_type_counts.append(0)
+
+        kill_type_counts, kill_types = zip(*sorted(zip(kill_type_counts, kill_types,))) #organize by kill_type_counts to "group" the non-zero radar graph entries
+
+        #create radar graph
+        radar_graph = go.Figure(data = go.Scatterpolar(
+            r=kill_type_counts,
+            theta=kill_types,
+            fill = 'toself'
+            ))
+
+        #update radar graph so that hover info is visible
+        radar_graph.update_layout(
+            polar = dict(
+                radialaxis = dict(
+                    visible = True
+                ),
+            ),
+            showlegend = False
+        )
+
         #return visualizations and other elements
         return html.Div([
             dcc.Graph(figure = fig),
         ]), html.Div([ 
             dcc.Graph(figure = hm), 
             ]), html.Div([ 
-            dcc.Graph(figure = dig_hm), 
+            dcc.Graph(figure = dig_hm),
+            ]), html.Div([ 
+            dcc.Graph(figure = radar_graph), 
             ]), html.Div([
+
+                html.H1(children = scored_message, style={'fontSize':24, 'textAlign':'left'}),
+
+                html.H1(children = error_message, style={'fontSize':24, 'textAlign':'left'}),
+
+                html.H1(children = hit_pct_message, style={'fontSize':24, 'textAlign':'left'}),
 
                 html.Img(src = r'assets/attack.jpg', alt = 'image', style={'height':'10%', 'width': '20%', 'display': 'inline-block', 'padding': 10}),
                 html.H2(children = kill_message, style={'fontSize':24, 'textAlign':'left', 'width': '70%', 'display': 'inline-block', 'padding': 10}),
@@ -282,11 +322,6 @@ def get_stats(n, data, player):
                 html.Img(src = r'assets/blocks.jpg', alt = 'image', style={'height':'10%', 'width': '20%', 'display': 'inline-block', 'padding': 10}),
                 html.H2(children = block_message, style={'fontSize':24, 'textAlign':'left', 'width': '70%', 'display': 'inline-block', 'padding': 10}),
 
-                html.H2(children = scored_message, style={'fontSize':24, 'textAlign':'left'}),
-
-                html.H2(children = error_message, style={'fontSize':24, 'textAlign':'left'}),
-
-                html.H2(children = hit_pct_message, style={'fontSize':24, 'textAlign':'left', 'width': '50%', 'display': 'inline-block'}),
             ])
 
     
