@@ -1,0 +1,209 @@
+Player,Set,Event,Location
+Mark,1,hard driven,1
+Michael,1,hard driven,1
+Mark,1,hit shank,
+Michael,1,roll shot,1
+Michael,1,roll shot,1
+Ben,1,tip,1
+Kyle,1,block kill,2
+Mark,1,roll shot,2
+Kyle,1,dig,3
+Kyle,1,cut shot,4
+Michael,1,cut shot,4
+Michael,1,tip,4
+Ben,1,dig,4
+Mark,1,dig,4
+Mark,1,dig,4
+Michael,1,hard driven,5
+Mark,1,block kill,5
+Mark,1,hard driven,5
+Michael,1,hard driven,5
+Kyle,1,tip,5
+Mark,1,touch,5
+Mark,1,dig,5
+Michael,1,dig,5
+Kyle,1,roll shot,6
+Ben,1,hitting error,
+Mark,1,hitting error,
+Mark,1,hitting error,
+Michael,1,hitting error,
+Michael,1,hitting error,
+Michael,1,hitting error,
+Ben,1,service error,
+Mark,1,service error,
+Michael,1,service error,
+Ben,1,block kill,4
+Ben,1,block shank,
+Ben,1,hit shank,
+Kyle,1,hit shank,
+Mark,1,hit shank,
+Michael,1,hit shank,
+Michael,1,hit shank,
+Michael,1,hit shank,
+Ben,1,serve shank,
+Kyle,1,serve shank,
+Michael,1,serve shank,
+Michael,1,serve shank,
+Michael,1,serve shank,
+Ben,1,tool,
+Ben,1,tool,
+Mark,1,tool,
+Ben,1,tool,
+Ben,1,cut attempt,
+Ben,1,roll attempt,
+Michael,1,hit attempt,
+Kyle,1,hit attempt,
+Ben,1,hit attempt,
+Kyle,1,roll attempt,
+Ben,1,hit attempt,
+Kyle ,1,hit attempt,
+Kyle,1,hit attempt,
+Mark,1,hit attempt,
+Mark,1,hit attempt,
+Ben,1,roll attempt,
+Kyle,1,hit attempt,
+Mark,1,hit attempt,
+Ben,1,roll attempt,
+Kyle,1,hit attempt,
+Michael,1,hit attempt,
+Ben,1,hit attempt,
+Michael,1,roll attempt,
+Kyle,1,roll attempt,
+Ben,1,roll attempt,
+Mark,1,cut attempt,
+Ben,1,hit attempt,
+Kyle,1,roll attempt,
+Kyle,2,cut shot,4
+Ben,2,hitting error,
+Ben,2,roll attempt,
+Kyle,2,hit attempt,
+Mark,2,dig,6
+Mark,2,tip,2
+Michael,2,hit shank,
+Mark,2,dig,5
+Michael,2,serve shank,
+Ben,2,roll shot,1
+Kyle,2,dig,1
+Kyle,2,hit attempt,
+Ben,2,hard driven,4
+Kyle,2,hit attempt,
+Ben,2,dig,1
+Ben,2,hit attempt,
+Michael,2,dig,1
+Kyle,2,double error,
+Kyle,2,hit attempt,
+Mark,2,dig,1
+Ben,2,touch,1
+Kyle,2,hit attempt,
+Mark,2,dig,4
+Mark,2,hit attempt,
+Kyle,2,hitting error,
+Mark ,2,dig,6
+Mark,2,hitting attempt,
+Michael,2,dig,1
+Michael,2,hitting error,
+Mark,2,dig,1
+Ben,2,touch,2
+Michael,2,hitting attempt,
+Mark,2,dig,5
+Ben,2,hitting attempt,
+Michael,2,dig,3
+Michael,2,hard driven,2
+Ben,2,hard driven,1
+Kyle,2,hitting attempt,
+Ben,2,hitting error,
+Mark,2,hitting attempt,
+Michael,2,block shank,
+Ben,2,hitting error,
+Mark,2,hitting attempt,
+Kyle,2,dig,1
+Kyle,2,roll shot,4
+Mark,2,hitting error,
+Mark,2,cut shot,2
+Kyle,2,hitting attempt,
+Mark,2,dig,1
+Mark,2,hitting attempt,
+Michael,2,dig,1
+Michael,2,hitting attempt,
+Ben,2,dig,1
+Kyle,2,hitting attempt,
+Ben,2,dig,1
+Mark,2,hitting attempt,
+Michael,2,hitting attempt,
+Mark,2,dig,5
+Mark,2,hitting attempt,
+Kyle,2,touch,2
+Ben,2,tip,4
+Michael,2,tool,
+Mark,2,tool,
+Michael,2,hitting error,
+Michael,2,hitting attempt,
+Mark,2,dig,2
+Mark,2,hitting attempt,
+Michael,2,dig error,
+Michael,2,cut attempt,
+Ben,2,dig,2
+Mark,2,touch,5
+Kyle,2,cut shot,4
+Mark,2,hard driven,6
+Ben,2,block kill,
+Mark,2,service error,
+Kyle,2,serve shank,
+Ben,2,hit attempt,
+Michael,2,block kill,
+Kyle,2,serve shank,
+Ben,2,hitting attempt,
+Kyle,2,touch,2
+Ben,2,hitting attempt,
+Kyle,2,hitting error,
+Ben,2,service error,
+Mark,2,hard driven,6
+Kyle,2,hitting attempt,
+Mark,2,dig,2
+Kyle,2,touch,5
+Kyle,2,service error,
+Kyle,2,hitting attempt,
+Ben,2,dig,5
+Ben,2,hitting attempt,
+Kyle,2,block kill,
+Ben,3,double error,
+Kyle,3,service error,
+Mark,3,tool,
+Ben,3,hitting attempt,
+Kyle,3,dig,5
+Kyle,3,hitting attempt,
+Ben,3,touch,5
+Kyle,3,hitting error,
+Ben,3,service error,
+Ben,3,hit shank,
+Mark,3,roll shot,1
+Michael,3,hit shank,
+Mark,3,roll shot,5
+Michael,3,hitting error,
+Kyle,3,serve shank,
+Michael,3,hitting attempt,
+Mark,3,block kill,
+Michael,3,hitting attempt,
+Kyle ,3,hitting attempt,
+Ben,3,touch,1
+Kyle,3,hit shank,
+Ben,3,hitting error,
+Michael,3,hitting error,
+Michael,3,roll shot,5
+Michael,3,dig,1
+Ben,3,hitting error,
+Mark,3,touch,1
+Ben,3,hitting error,
+Ben,3,hard driven,5
+Kyle,3,roll shot,1
+Ben,3,hard driven,6
+Mark,3,hard driven,1
+Michael,3,hitting error,
+Ben,3,hitting error,
+Mark,3,block,
+Ben,3,hitting attempt,
+Ben,3,hitting error,
+Kyle,3,serve shank,
+Ben,3,hitting attempt,
+Kyle,3,dig,5
+Kyle,3,hard driven,1
