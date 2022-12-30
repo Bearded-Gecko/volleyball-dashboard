@@ -4,6 +4,8 @@ from dash import html, dcc
 
 app = dash.Dash(__name__, use_pages=True)
 
+server = app.server #for render.com
+
 app.layout = html.Div(
     [
         # main app framework
