@@ -3,12 +3,19 @@
 # Objective
 Interactive dashboard to visualize volleyball data and statistics to improve performance
 
-Website: https://vball-dashboard.onrender.com/
+Website: https://vball-dashboard.onrender.com/  
 Demo: https://vball-dashboard.onrender.com/example
 
-# How To Use
-File must be of type, .CSV
+## How To Use
+File must be of type, .CSV  
+
 CSV formatting should at least contain the following 4 features, attributes, or headings: 'Player', 'Set', 'Event', and 'Location' in any order
+
+## Relevant Files
+requirements.txt contains package version requirements for Render  
+pages folder contains individual python files used to generate each page in web application  
+app.py is the entry point for the multi-page application  
+assets folder contains example CSV data and pictures used in application  
 
 ## Data Feature Definitions
 **Player**
